@@ -66,7 +66,6 @@ static void test(const char input[], const char output[])
 
 int main(void)
 {
-	printf("%zu\n", sizeof (size_t));
 	for (size_t i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
 		const struct vector *vector = &VECTORS[i];
 		test(vector->input, vector->output);
