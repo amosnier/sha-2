@@ -236,6 +236,7 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 		h7 = h7 + h;
 	}
 
+	/* Produce the final hash value (big-endian): */
 	hash[0] = (uint8_t) (h0 >> 24);
 	hash[1] = (uint8_t) (h0 >> 16);
 	hash[2] = (uint8_t) (h0 >> 8);
