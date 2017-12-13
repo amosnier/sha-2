@@ -21,6 +21,12 @@ At the moment, only SHA-256 is implemented.
   [Wikipedia](https://en.wikipedia.org/wiki/SHA-2). At the moment,
   no effort at all has been put on optimization.
 
+## Testing
+
+Some testing has been performed, that hopefully proves that the
+implementation is correct. However, no effort has so far been put into
+testing large sizes of data.
+
 ## Notes
 
 The Makefile is as minimal as possible. No effort was put into making
