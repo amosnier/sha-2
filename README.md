@@ -4,7 +4,7 @@
 
 SHA-2 algorithm implementations.
 
-At the moment, only a SHA-256 is implemented.
+At the moment, only SHA-256 is implemented.
 
 ## Design criteria
 
