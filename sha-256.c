@@ -134,6 +134,9 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
  * - sizeof size_t is assumed to be either 8, 16, 32 or 64. Otherwise, the results are unpredictable.
  * - Since input is a pointer in RAM, the data to hash should be in RAM, which could be a problem
  *   for large data sizes.
+ * - SHA algorithms theoritically operate on bit strings. However, this implementation has no support
+ *   for bit string lengths that are not multiples of eight, and it really operates on arrays of bytes.
+ *   the len parameter is a number of bytes.
  */
 void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 {
