@@ -71,6 +71,8 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 	memcpy(chunk, state->p, state->len);
 	chunk += state->len;
 	space_in_chunk = CHUNK_SIZE - state->len;
+	state->p += state->len;
+	state->len = 0;
 
 	/* If we are here, space_in_chunk is one at minimum. */
 	if (!state->single_one_delivered) {
@@ -83,21 +85,39 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 	 * Now:
 	 * - either there is enough space left for the total length, and we can conclude,
 	 * - or there is too little space left, and we have to pad the rest of this chunk with zeroes.
-	 * In the latter case, we will conclude at the next pass.
+	 * In the latter case, we will conclude at the next invokation of this function.
 	 */
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
 		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
-		const size_t len = state->total_len;
+		const size_t len = state->total_len * 8;
 		memset(chunk, 0x00, left);
 		chunk += left;
 
-		chunk[0] = (uint8_t) (len >> 56);
-		chunk[1] = (uint8_t) (len >> 48);
-		chunk[2] = (uint8_t) (len >> 40);
-		chunk[3] = (uint8_t) (len >> 32);
-		chunk[4] = (uint8_t) (len >> 24);
-		chunk[5] = (uint8_t) (len >> 16);
-		chunk[6] = (uint8_t) (len >> 8);
+		if (sizeof len > 4) {
+			chunk[0] = (uint8_t) (len >> 56);
+			chunk[1] = (uint8_t) (len >> 48);
+			chunk[2] = (uint8_t) (len >> 40);
+			chunk[3] = (uint8_t) (len >> 32);
+		} else {
+			chunk[0] = 0;
+			chunk[1] = 0;
+			chunk[2] = 0;
+			chunk[3] = 0;
+		}
+		if (sizeof len > 2) {
+			chunk[4] = (uint8_t) (len >> 24);
+			chunk[5] = (uint8_t) (len >> 16);
+		} else {
+			chunk[4] = 0;
+			chunk[5] = 0;
+		}
+		
+		if (sizeof len > 1) {
+			chunk[6] = (uint8_t) (len >> 8);
+		} else {
+			chunk[6] = 0;
+		}
+		
 		chunk[7] = (uint8_t) len;
 
 		state->total_len_delivered = 1;
@@ -108,6 +128,13 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 	return 1;
 }
 
+/*
+ * Limitations:
+ * - len must be small enough for (8 * len) to fit in len. Otherwise, the results are unpredictable.
+ * - sizeof size_t is assumed to be either 8, 16, 32 or 64. Otherwise, the results are unpredictable.
+ * - Since input is a pointer in RAM, the data to hash should be in RAM, which could be a problem
+ *   for large data sizes.
+ */
 void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 {
 	/*
@@ -161,8 +188,8 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 
 		/* Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array: */
 		for (int i = 16; i < 64; i++) {
-			const uint32_t s0 = right_rot(w[i - 15], 7) ^ right_rot(w[i - 15], 18) ^ w[i - 15] >> 3;
-			const uint32_t s1 = right_rot(w[i - 2], 17) ^ right_rot(w[i - 2], 19) ^ w[i - 2] >> 10;
+			const uint32_t s0 = right_rot(w[i - 15], 7) ^ right_rot(w[i - 15], 18) ^ (w[i - 15] >> 3);
+			const uint32_t s1 = right_rot(w[i - 2], 17) ^ right_rot(w[i - 2], 19) ^ (w[i - 2] >> 10);
 			w[i] = w[i - 16] + s0 + w[i - 7] + s1;
 		}
 		
@@ -179,10 +206,10 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 		/* Compression function main loop: */
 		for (int i = 0; i < 64; i++) {
 			const uint32_t s1 = right_rot(e, 6) ^ right_rot(e, 11) ^ right_rot(e, 25);
-			const uint32_t ch = e & f ^ ~e & g;
+			const uint32_t ch = (e & f) ^ (~e & g);
 			const uint32_t temp1 = h + s1 + ch + k[i] + w[i];
-			const uint32_t s0 = right_rot(a, 2) ^right_rot(a, 13) ^ right_rot(a, 22);
-			const uint32_t maj = a & b ^ a & c ^ b & c;
+			const uint32_t s0 = right_rot(a, 2) ^ right_rot(a, 13) ^ right_rot(a, 22);
+			const uint32_t maj = (a & b) ^ (a & c) ^ (b & c);
 			const uint32_t temp2 = s0 + maj;
 
 			h = g;

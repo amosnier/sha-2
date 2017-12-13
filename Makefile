@@ -1,3 +1,5 @@
+CFLAGS = -Wall -Wextra -Wpedantic
+
 test: test.o sha-256.o
 
 .PHONY: clean
