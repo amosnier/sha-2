@@ -21,6 +21,13 @@ At the moment, only SHA-256 is implemented.
   [Wikipedia](https://en.wikipedia.org/wiki/SHA-2). At the moment,
   no effort at all has been put on optimization.
 
+## Notes
+
+The Makefile is as minimal as possible. No effort was put into making
+it general. Its purpose is mainly to ease testing for the developer's
+host machine. The actual implementation is however extremely easy to
+include in any project, may it use GNU make or any other build tool.
+
 ## License
 
 This repository is made available in the public domain. See [LICENSE
