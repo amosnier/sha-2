@@ -35,15 +35,40 @@ static const struct vector VECTORS[] = {
 		"248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
 	},
 	{
-		"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoi"
-		"jklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+		"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno"
+		"ijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
 		"cf5b16a778af8380036ce59e7b0492370b249b11e8f07a51afac45037afee9d1"
+	},
+	{
+		"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno"
+		"ijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghi"
+		"cdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopq"
+		"klmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijk"
+		"efghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrs"
+		"mnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijkefghijklfghijklm"
+		"ghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"
+		"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno"
+		"ijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghi"
+		"cdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopq"
+		"klmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijk"
+		"efghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrs"
+		"mnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijkefghijklfghijklm"
+		"ghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"
+		"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno"
+		"ijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghi"
+		"cdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopq"
+		"klmnopqrlmnopqrsmnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijk"
+		"efghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrs"
+		"mnopqrstnopqrstuabcdefghbcdefghicdefghijdefghijkefghijklfghijklm"
+		"ghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+		"c7273f978615fc09e6a567bb28586fa30b76a2c915ffcdc728d3414fceb63493"
 	}
 };
 
 static void hash_to_string(char string[65], const uint8_t hash[32])
 {
-	for (size_t i = 0; i < 32; i++) {
+	size_t i;
+	for (i = 0; i < 32; i++) {
 		string += sprintf(string, "%02x", hash[i]);
 	}
 }	
@@ -66,7 +91,8 @@ static void test(const char input[], const char output[])
 
 int main(void)
 {
-	for (size_t i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
+	size_t i;
+	for (i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
 		const struct vector *vector = &VECTORS[i];
 		test(vector->input, vector->output);
 	}

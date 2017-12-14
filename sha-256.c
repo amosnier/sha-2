@@ -93,30 +93,31 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 		memset(chunk, 0x00, left);
 		chunk += left;
 
-		if (sizeof len > 4) {
-			chunk[0] = (uint8_t) (len >> 56);
-			chunk[1] = (uint8_t) (len >> 48);
-			chunk[2] = (uint8_t) (len >> 40);
-			chunk[3] = (uint8_t) (len >> 32);
-		} else {
-			chunk[0] = 0;
-			chunk[1] = 0;
-			chunk[2] = 0;
-			chunk[3] = 0;
-		}
-		if (sizeof len > 2) {
-			chunk[4] = (uint8_t) (len >> 24);
-			chunk[5] = (uint8_t) (len >> 16);
-		} else {
-			chunk[4] = 0;
-			chunk[5] = 0;
-		}
+#if SIZE_MAX > UINT32_MAX
+		chunk[0] = (uint8_t) (len >> 56);
+		chunk[1] = (uint8_t) (len >> 48);
+		chunk[2] = (uint8_t) (len >> 40);
+		chunk[3] = (uint8_t) (len >> 32);
+#else
+		chunk[0] = 0;
+		chunk[1] = 0;
+		chunk[2] = 0;
+		chunk[3] = 0;
+#endif
+
+#if SIZE_MAX > UINT16_MAX
+		chunk[4] = (uint8_t) (len >> 24);
+		chunk[5] = (uint8_t) (len >> 16);
+#else
+		chunk[4] = 0;
+		chunk[5] = 0;
+#endif
 		
-		if (sizeof len > 1) {
-			chunk[6] = (uint8_t) (len >> 8);
-		} else {
-			chunk[6] = 0;
-		}
+#if SIZE_MAX > UINT8_MAX
+		chunk[6] = (uint8_t) (len >> 8);
+#else
+		chunk[6] = 0;
+#endif
 		
 		chunk[7] = (uint8_t) len;
 
@@ -181,16 +182,17 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 		 */
 		uint32_t w[64];
 		const uint8_t *p = chunk;
+		int i;
 
 		memset(w, 0x00, sizeof w);
-		for (int i = 0; i < 16; i++) {
+		for (i = 0; i < 16; i++) {
 			w[i] = (uint32_t) p[0] << 24 | (uint32_t) p[1] << 16 |
 				(uint32_t) p[2] << 8 | (uint32_t) p[3];
 			p += 4;
 		}
 
 		/* Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array: */
-		for (int i = 16; i < 64; i++) {
+		for (i = 16; i < 64; i++) {
 			const uint32_t s0 = right_rot(w[i - 15], 7) ^ right_rot(w[i - 15], 18) ^ (w[i - 15] >> 3);
 			const uint32_t s1 = right_rot(w[i - 2], 17) ^ right_rot(w[i - 2], 19) ^ (w[i - 2] >> 10);
 			w[i] = w[i - 16] + s0 + w[i - 7] + s1;
@@ -207,7 +209,7 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 		h = h7;
 
 		/* Compression function main loop: */
-		for (int i = 0; i < 64; i++) {
+		for (i = 0; i < 64; i++) {
 			const uint32_t s1 = right_rot(e, 6) ^ right_rot(e, 11) ^ right_rot(e, 25);
 			const uint32_t ch = (e & f) ^ (~e & g);
 			const uint32_t temp1 = h + s1 + ch + k[i] + w[i];
