@@ -34,6 +34,11 @@ it general. Its purpose is mainly to ease testing for the developer's
 host machine. The actual implementation is however extremely easy to
 include in any project, may it use GNU make or any other build tool.
 
+## Code review
+
+This code has been posted for review at [Stack Exchange CODE
+REVIEW](https://codereview.stackexchange.com/questions/182812/self-contained-sha-256-implementation-in-c).
+
 ## License
 
 This repository is made available in the public domain. See [LICENSE
