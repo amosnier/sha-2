@@ -182,7 +182,7 @@ static void hash_to_string(char string[65], const uint8_t hash[32])
 	}
 }	
 	
-static void string_test(const char input[], const char output[])
+static int string_test(const char input[], const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
@@ -192,12 +192,14 @@ static void string_test(const char input[], const char output[])
 	printf("hash : %s\n", hash_string);
 	if (strcmp(output, hash_string)) {
 		printf("FAILURE!\n\n");
+		return 1;
 	} else {
 		printf("SUCCESS!\n\n");
+		return 0;
 	}		
 }
 
-static void test(const uint8_t * input, size_t input_len, const char output[])
+static int test(const uint8_t * input, size_t input_len, const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
@@ -207,8 +209,10 @@ static void test(const uint8_t * input, size_t input_len, const char output[])
 	printf("hash : %s\n", hash_string);
 	if (strcmp(output, hash_string)) {
 		printf("FAILURE!\n\n");
+		return 1;
 	} else {
 		printf("SUCCESS!\n\n");
+		return 0;
 	}
 }
 
@@ -217,12 +221,14 @@ int main(void)
 	size_t i;
 	for (i = 0; i < (sizeof STRING_VECTORS / sizeof (struct string_vector)); i++) {
 		const struct string_vector *vector = &STRING_VECTORS[i];
-		string_test(vector->input, vector->output);
+		if (string_test(vector->input, vector->output))
+			return 1;
 	}
 	construct_binary_messages();
 	for (i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
 		const struct vector *vector = &VECTORS[i];
-		test(vector->input, vector->input_len, vector->output);
+		if (test(vector->input, vector->input_len, vector->output))
+			return 1;
 	}
 	return 0;
 }
