@@ -18,8 +18,7 @@ At the moment, only SHA-256 is implemented.
 
 - The SHA-256 implementation is a straightforward implementation of
   the algorithm specified on
-  [Wikipedia](https://en.wikipedia.org/wiki/SHA-2). At the moment,
-  no effort at all has been put on optimization.
+  [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
 
 ## Notes
 
