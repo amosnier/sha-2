@@ -35,7 +35,9 @@ and the implementation has been improved accordingly.
 
 ## Testing
 
-**NEW!** Testing is now continuously performed on Travis! [![Build Status](https://travis-ci.org/amosnier/sha-2.svg?branch=master)](https://travis-ci.org/amosnier/sha-2)
+**NEW!** Testing is now continuously performed on Travis!
+
+[![Build Status](https://travis-ci.org/amosnier/sha-2.svg?branch=master)](https://travis-ci.org/amosnier/sha-2)
 
 The implementation has been successfully tested on an x86-64 machine
 under Linux as well as on a 16-bit DSP. On the x86-64 machine, all the
