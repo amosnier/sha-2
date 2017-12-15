@@ -44,15 +44,18 @@ and [SHA-2 Additional
 examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA2_Additional.pdf),
 plus a few others):
 
-```Input Message: "abc"
+```
+Input Message: "abc"
 Message Digest is BA7816BF 8F01CFEA 414140DE 5DAE2223 B00361A3 96177A9C B410FF61 F20015AD
 ```
 
-```Input Message: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
+```
+Input Message: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
 Message Digest is 248D6A61 D20638B8 E5C02693 0C3E6039 A33CE459 64FF2167 F6ECEDD4 19DB06C1
 ```
 
-```SHA-256 Test Data
+```
+SHA-256 Test Data
 #1) 1 byte 0xbd 
 68325720 aabd7c82 f30f554b 313d0570 c95accbb 7dc4b5aa e11204c0 8ffe732b
 #2) 4 bytes 0xc98c8e55 
