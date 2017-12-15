@@ -41,7 +41,7 @@ static const struct string_vector STRING_VECTORS[] = {
 	}
 };
 
-#define LARGE_MESSAGES 0
+#define LARGE_MESSAGES 1
 
 static uint8_t data1[] = { 0xbd };
 static uint8_t data2[] = { 0xc9, 0x8c, 0x8e, 0x55 };
