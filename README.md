@@ -35,7 +35,7 @@ and the implementation has been improved accordingly.
 
 ## Testing
 
-**NEW!** Testing is now continuously performed on Travis!
+**NEW!** Testing is now continuously performed on Travis CI!
 
 [![Build Status](https://travis-ci.org/amosnier/sha-2.svg?branch=master)](https://travis-ci.org/amosnier/sha-2)
 
