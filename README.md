@@ -45,10 +45,12 @@ examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-
 plus a few others):
 
 ```Input Message: "abc"
-Message Digest is BA7816BF 8F01CFEA 414140DE 5DAE2223 B00361A3 96177A9C B410FF61 F20015AD```
+Message Digest is BA7816BF 8F01CFEA 414140DE 5DAE2223 B00361A3 96177A9C B410FF61 F20015AD
+```
 
 ```Input Message: "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
-Message Digest is 248D6A61 D20638B8 E5C02693 0C3E6039 A33CE459 64FF2167 F6ECEDD4 19DB06C1```
+Message Digest is 248D6A61 D20638B8 E5C02693 0C3E6039 A33CE459 64FF2167 F6ECEDD4 19DB06C1
+```
 
 ```SHA-256 Test Data
 #1) 1 byte 0xbd 
@@ -76,7 +78,8 @@ d29751f2 649b32ff 572b5e0a 9f541ea6 60a50f94 ff0beedf b0b692b9 24cc8025
 #12) 0x41000000 (1090519040) bytes of zeros 
 461c19a9 3bd4344f 9215f5ec 64357090 342bc66b 15a14831 7d276e31 cbc20b53 
 #13) 0x6000003e (1610612798) bytes of 0x42 ‘B’ 
-c23ce8a7 895f4b21 ec0daf37 920ac0a2 62a22004 5a03eb2d fed48ef9 b05aabea```
+c23ce8a7 895f4b21 ec0daf37 920ac0a2 62a22004 5a03eb2d fed48ef9 b05aabea
+```
 
 ## License
 
