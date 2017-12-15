@@ -34,8 +34,8 @@ struct buffer_state {
 	const uint8_t * p;
 	size_t len;
 	size_t total_len;
-	int single_one_delivered; // bool
-	int total_len_delivered; // bool
+	int single_one_delivered; /* bool */
+	int total_len_delivered; /* bool */
 };
 
 static inline uint32_t right_rot(uint32_t value, unsigned int count)
