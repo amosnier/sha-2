@@ -1,4 +1,4 @@
-# sha-2
+# sha-2 https://travis-ci.org/amosnier/sha-2.svg?branch=master
 
 ## Contents
 
