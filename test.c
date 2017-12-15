@@ -4,12 +4,12 @@
 
 #include "sha-256.h"
 
-struct vector {
+struct string_vector {
 	const char *input;
 	const char *output;
 };
 
-static const struct vector VECTORS[] = {
+static const struct string_vector STRING_VECTORS[] = {
 	{
 		"",
 		"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -65,6 +65,115 @@ static const struct vector VECTORS[] = {
 	}
 };
 
+#define LARGE_MESSAGES 0
+
+static uint8_t data1[] = { 0xbd };
+static uint8_t data2[] = { 0xc9, 0x8c, 0x8e, 0x55 };
+static uint8_t data7[1000];
+static uint8_t data8[1000];
+static uint8_t data9[1005];
+#if LARGE_MESSAGES
+static uint8_t data11[536870912];
+static uint8_t data12[1090519040];
+static uint8_t data13[1610612798];
+#endif
+
+static void construct_binary_messages(void)
+{
+	size_t i;
+	for (i = 0; i < sizeof data7; i++)
+		data7[i] = 0;
+	for (i = 0; i < sizeof data8; i++)
+		data8[i] = 0x41;
+	for (i = 0; i < sizeof data9; i++)
+		data9[i] = 0x55;
+#if LARGE_MESSAGES
+	for (i = 0; i < sizeof data11; i++)
+		data11[i] = 0x5a;
+	for (i = 0; i < sizeof data12; i++)
+		data12[i] = 0;
+	for (i = 0; i < sizeof data13; i++)
+		data13[i] = 0x42;
+#endif
+}
+
+struct vector {
+	const uint8_t *input;
+	size_t input_len;
+	const char *output;
+};
+
+static const struct vector VECTORS[] = {
+	{
+		data1,
+		sizeof data1,
+		"68325720aabd7c82f30f554b313d0570c95accbb7dc4b5aae11204c08ffe732b"
+	},
+	{
+		data2,
+		sizeof data2,
+		"7abc22c0ae5af26ce93dbb94433a0e0b2e119d014f8e7f65bd56c61ccccd9504"
+	},
+	{
+		data7,
+		55,
+		"02779466cdec163811d078815c633f21901413081449002f24aa3e80f0b88ef7"
+	},
+	{
+		data7,
+		56,
+		"d4817aa5497628e7c77e6b606107042bbba3130888c5f47a375e6179be789fbb"
+	},
+	{
+		data7,
+		57,
+		"65a16cb7861335d5ace3c60718b5052e44660726da4cd13bb745381b235a1785"
+	},
+	{
+		data7,
+		64,
+		"f5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"
+	},
+	{
+		data7,
+		sizeof data7,
+		"541b3e9daa09b20bf85fa273e5cbd3e80185aa4ec298e765db87742b70138a53"
+	},
+	{
+		data8,
+		sizeof data8,
+		"c2e686823489ced2017f6059b8b239318b6364f6dcd835d0a519105a1eadd6e4"
+	},
+	{
+		data9,
+		sizeof data9,
+		"f4d62ddec0f3dd90ea1380fa16a5ff8dc4c54b21740650f24afc4120903552b0"
+	}
+#if LARGE_MESSAGES
+	,
+	{
+		data12,
+		1000000,
+		"d29751f2649b32ff572b5e0a9f541ea660a50f94ff0beedfb0b692b924cc8025"
+	},
+	{
+		data11,
+		sizeof data11,
+		"15a1868c12cc53951e182344277447cd0979536badcc512ad24c67e9b2d4f3dd"
+	},
+	{
+		data12,
+		sizeof data12,
+		"461c19a93bd4344f9215f5ec64357090342bc66b15a148317d276e31cbc20b53"
+	},
+	{
+		data13,
+		sizeof data13,
+		"c23ce8a7895f4b21ec0daf37920ac0a262a220045a03eb2dfed48ef9b05aabea"
+	}
+#endif
+};
+
 static void hash_to_string(char string[65], const uint8_t hash[32])
 {
 	size_t i;
@@ -73,7 +182,7 @@ static void hash_to_string(char string[65], const uint8_t hash[32])
 	}
 }	
 	
-static void test(const char input[], const char output[])
+static void string_test(const char input[], const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
@@ -87,14 +196,33 @@ static void test(const char input[], const char output[])
 		printf("SUCCESS!\n\n");
 	}		
 }
-	
+
+static void test(const uint8_t * input, size_t input_len, const char output[])
+{
+	uint8_t hash[32];
+	char hash_string[65];
+	calc_sha_256(hash, input, input_len);
+	hash_to_string(hash_string, hash);
+	printf("input starts with 0x%02x, length %lu\n", *input, input_len);
+	printf("hash : %s\n", hash_string);
+	if (strcmp(output, hash_string)) {
+		printf("FAILURE!\n\n");
+	} else {
+		printf("SUCCESS!\n\n");
+	}
+}
 
 int main(void)
 {
 	size_t i;
+	for (i = 0; i < (sizeof STRING_VECTORS / sizeof (struct string_vector)); i++) {
+		const struct string_vector *vector = &STRING_VECTORS[i];
+		string_test(vector->input, vector->output);
+	}
+	construct_binary_messages();
 	for (i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
 		const struct vector *vector = &VECTORS[i];
-		test(vector->input, vector->output);
+		test(vector->input, vector->input_len, vector->output);
 	}
 	return 0;
 }
