@@ -41,7 +41,9 @@ available NIST test vectors where successfully tested ([SHA-256
 examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf)
 and [SHA-2 Additional
 examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA2_Additional.pdf),
-plus a few others):
+plus a few others).
+
+In particular:
 
 ```
 Input Message: "abc"
