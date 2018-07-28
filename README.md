@@ -35,7 +35,7 @@ and the implementation has been improved accordingly.
 
 ## Testing
 
-Testing is continuously performed on Travis CI!
+Testing is continuously performed on Travis CI (see above).
 
 Apart from that, the implementation has been successfully tested on an x86-64 machine
 under Linux as well as on a 16-bit DSP. On the x86-64 machine, all the
