@@ -93,3 +93,7 @@ c23ce8a7 895f4b21 ec0daf37 920ac0a2 62a22004 5a03eb2d fed48ef9 b05aabea
 
 This repository is made available in the public domain. See [LICENSE
 FILE](LICENSE).
+
+## Reference implementation
+
+I had missed that when I made this implementation but [RFC 6234, chapter 8](https://tools.ietf.org/html/rfc6234#section-8) actually includes a reference implementation in C that is (at least in ambition) broader in scope than this one. I have however neither compiled not tested it.
