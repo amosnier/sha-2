@@ -137,23 +137,20 @@ static struct vector vectors[] = {
 
 static void construct_binary_messages(void)
 {
-	size_t i;
-	for (i = 0; i < sizeof data7; i++)
-		data7[i] = 0;
-	for (i = 0; i < sizeof data8; i++)
-		data8[i] = 0x41;
-	for (i = 0; i < sizeof data9; i++)
-		data9[i] = 0x55;
+	memset(data7, 0x00, sizeof data7);
+	memset(data8, 0x41, sizeof data8);
+	memset(data9, 0x55, sizeof data9);
 #if LARGE_MESSAGES
+	/*
+	 * Heap allocation as a workaround for some linkers not liking
+	 * large BSS segments.
+	 */
 	data11 = malloc(SIZEOF_DATA11);
 	data12 = malloc(SIZEOF_DATA12);
 	data13 = malloc(SIZEOF_DATA13);
-	for (i = 0; i < SIZEOF_DATA11; i++)
-		data11[i] = 0x5a;
-	for (i = 0; i < SIZEOF_DATA12; i++)
-		data12[i] = 0;
-	for (i = 0; i < SIZEOF_DATA13; i++)
-		data13[i] = 0x42;
+	memset(data11, 0x5a, SIZEOF_DATA11);
+	memset(data12, 0x00, SIZEOF_DATA12);
+	memset(data13, 0x42, SIZEOF_DATA13);
 	vectors[9].input = data12;
 	vectors[10].input = data11;
 	vectors[11].input = data12;
