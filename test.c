@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "sha-256.h"
 
@@ -49,29 +50,13 @@ static uint8_t data7[1000];
 static uint8_t data8[1000];
 static uint8_t data9[1005];
 #if LARGE_MESSAGES
-static uint8_t data11[536870912];
-static uint8_t data12[1090519040];
-static uint8_t data13[1610612798];
+#define SIZEOF_DATA11 536870912
+#define SIZEOF_DATA12 1090519040
+#define SIZEOF_DATA13 1610612798
+static uint8_t * data11;
+static uint8_t * data12;
+static uint8_t * data13;
 #endif
-
-static void construct_binary_messages(void)
-{
-	size_t i;
-	for (i = 0; i < sizeof data7; i++)
-		data7[i] = 0;
-	for (i = 0; i < sizeof data8; i++)
-		data8[i] = 0x41;
-	for (i = 0; i < sizeof data9; i++)
-		data9[i] = 0x55;
-#if LARGE_MESSAGES
-	for (i = 0; i < sizeof data11; i++)
-		data11[i] = 0x5a;
-	for (i = 0; i < sizeof data12; i++)
-		data12[i] = 0;
-	for (i = 0; i < sizeof data13; i++)
-		data13[i] = 0x42;
-#endif
-}
 
 struct vector {
 	const uint8_t *input;
@@ -79,7 +64,7 @@ struct vector {
 	const char *output;
 };
 
-static const struct vector VECTORS[] = {
+static struct vector vectors[] = {
 	{
 		data1,
 		sizeof data1,
@@ -128,27 +113,62 @@ static const struct vector VECTORS[] = {
 #if LARGE_MESSAGES
 	,
 	{
-		data12,
+		NULL,
 		1000000,
 		"d29751f2649b32ff572b5e0a9f541ea660a50f94ff0beedfb0b692b924cc8025"
 	},
 	{
-		data11,
-		sizeof data11,
+		NULL,
+		SIZEOF_DATA11,
 		"15a1868c12cc53951e182344277447cd0979536badcc512ad24c67e9b2d4f3dd"
 	},
 	{
-		data12,
-		sizeof data12,
+		NULL,
+		SIZEOF_DATA12,
 		"461c19a93bd4344f9215f5ec64357090342bc66b15a148317d276e31cbc20b53"
 	},
 	{
-		data13,
-		sizeof data13,
+		NULL,
+		SIZEOF_DATA13,
 		"c23ce8a7895f4b21ec0daf37920ac0a262a220045a03eb2dfed48ef9b05aabea"
 	}
 #endif
 };
+
+static void construct_binary_messages(void)
+{
+	size_t i;
+	for (i = 0; i < sizeof data7; i++)
+		data7[i] = 0;
+	for (i = 0; i < sizeof data8; i++)
+		data8[i] = 0x41;
+	for (i = 0; i < sizeof data9; i++)
+		data9[i] = 0x55;
+#if LARGE_MESSAGES
+	data11 = malloc(SIZEOF_DATA11);
+	data12 = malloc(SIZEOF_DATA12);
+	data13 = malloc(SIZEOF_DATA13);
+	for (i = 0; i < SIZEOF_DATA11; i++)
+		data11[i] = 0x5a;
+	for (i = 0; i < SIZEOF_DATA12; i++)
+		data12[i] = 0;
+	for (i = 0; i < SIZEOF_DATA13; i++)
+		data13[i] = 0x42;
+	vectors[9].input = data12;
+	vectors[10].input = data11;
+	vectors[11].input = data12;
+	vectors[12].input = data13;
+#endif
+}
+
+static void destruct_binary_messages(void)
+{
+#if LARGE_MESSAGES
+	free(data11);
+	free(data12);
+	free(data13);
+#endif
+}
 
 static void hash_to_string(char string[65], const uint8_t hash[32])
 {
@@ -208,10 +228,14 @@ int main(void)
 			return 1;
 	}
 	construct_binary_messages();
-	for (i = 0; i < (sizeof VECTORS / sizeof (struct vector)); i++) {
-		const struct vector *vector = &VECTORS[i];
+	for (i = 0; i < (sizeof vectors / sizeof (struct vector)); i++) {
+		const struct vector *vector = &vectors[i];
 		if (test(vector->input, vector->input_len, vector->output))
+		{
+			destruct_binary_messages();
 			return 1;
+		}
 	}
+	destruct_binary_messages();
 	return 0;
 }
