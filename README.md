@@ -96,4 +96,4 @@ FILE](LICENSE).
 
 ## Reference implementation
 
-I had missed that when I made this implementation but [RFC 6234, chapter 8](https://tools.ietf.org/html/rfc6234#section-8) actually includes a reference implementation in C that is (at least in ambition) broader in scope than this one. I have however neither compiled not tested it.
+I had missed that when I made this implementation but [RFC 6234, chapter 8](https://tools.ietf.org/html/rfc6234#section-8) actually includes a reference implementation in C that is (at least in ambition) broader in scope than this one. I have however neither compiled nor tested it.
