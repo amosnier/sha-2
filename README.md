@@ -35,11 +35,9 @@ and the implementation has been improved accordingly.
 
 ## Testing
 
-**NEW!** Testing is now continuously performed on Travis CI!
+Testing is continuously performed on Travis CI!
 
-[![Build Status](https://travis-ci.org/amosnier/sha-2.svg?branch=master)](https://travis-ci.org/amosnier/sha-2)
-
-The implementation has been successfully tested on an x86-64 machine
+Apart from that, the implementation has been successfully tested on an x86-64 machine
 under Linux as well as on a 16-bit DSP. On the x86-64 machine, all the
 available NIST test vectors where successfully tested ([SHA-256
 examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf)
