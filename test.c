@@ -175,13 +175,20 @@ static int string_test(const char input[], const char output[])
 	}		
 }
 
+/*
+ * Limitation:
+ * - The variable input_len will be truncated to its LONG_BIT least
+ * significant bits in the print output. This will never be a problem
+ * for values that in practice are less than 2^32 - 1. Rationale: ANSI
+ * C-compatibility and keeping it simple.
+ */
 static int test(const uint8_t * input, size_t input_len, const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
 	calc_sha_256(hash, input, input_len);
 	hash_to_string(hash_string, hash);
-	printf("input starts with 0x%02x, length %lu\n", *input, input_len);
+	printf("input starts with 0x%02x, length %lu\n", *input, (unsigned long) input_len);
 	printf("hash : %s\n", hash_string);
 	if (strcmp(output, hash_string)) {
 		printf("FAILURE!\n\n");
