@@ -137,7 +137,7 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 * (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
 	 */
 	uint32_t h[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
-	int i, j;
+	unsigned i, j;
 
 	/* 512-bit chunks is what we will operate on. */
 	uint8_t chunk[64];
@@ -148,50 +148,59 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 
 	while (calc_chunk(chunk, &state)) {
 		uint32_t ah[8];
-		
-		/*
-		 * create a 64-entry message schedule array w[0..63] of 32-bit words
-		 * (The initial values in w[0..63] don't matter, so many implementations zero them here)
-		 * copy chunk into first 16 words w[0..15] of the message schedule array
-		 */
-		uint32_t w[64];
+
 		const uint8_t *p = chunk;
 
-		memset(w, 0x00, sizeof w);
-		for (i = 0; i < 16; i++) {
-			w[i] = (uint32_t) p[0] << 24 | (uint32_t) p[1] << 16 |
-				(uint32_t) p[2] << 8 | (uint32_t) p[3];
-			p += 4;
-		}
-
-		/* Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array: */
-		for (i = 16; i < 64; i++) {
-			const uint32_t s0 = right_rot(w[i - 15], 7) ^ right_rot(w[i - 15], 18) ^ (w[i - 15] >> 3);
-			const uint32_t s1 = right_rot(w[i - 2], 17) ^ right_rot(w[i - 2], 19) ^ (w[i - 2] >> 10);
-			w[i] = w[i - 16] + s0 + w[i - 7] + s1;
-		}
-		
 		/* Initialize working variables to current hash value: */
 		for (i = 0; i < 8; i++)
 			ah[i] = h[i];
 
 		/* Compression function main loop: */
-		for (i = 0; i < 64; i++) {
-			const uint32_t s1 = right_rot(ah[4], 6) ^ right_rot(ah[4], 11) ^ right_rot(ah[4], 25);
-			const uint32_t ch = (ah[4] & ah[5]) ^ (~ah[4] & ah[6]);
-			const uint32_t temp1 = ah[7] + s1 + ch + k[i] + w[i];
-			const uint32_t s0 = right_rot(ah[0], 2) ^ right_rot(ah[0], 13) ^ right_rot(ah[0], 22);
-			const uint32_t maj = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2]);
-			const uint32_t temp2 = s0 + maj;
+		for (i = 0; i < 4; i++) {
+			/*
+			 * The w-array is really w[64], but since we only need
+			 * 16 of them at a time, we save stack by calculating
+			 * 16 at a time.
+			 *
+			 * This optimization was not there initially and the
+			 * rest of the comments about w[64] are kept in their
+			 * initial state.
+			 */
 
-			ah[7] = ah[6];
-			ah[6] = ah[5];
-			ah[5] = ah[4];
-			ah[4] = ah[3] + temp1;
-			ah[3] = ah[2];
-			ah[2] = ah[1];
-			ah[1] = ah[0];
-			ah[0] = temp1 + temp2;
+			/*
+			 * create a 64-entry message schedule array w[0..63] of 32-bit words
+			 * (The initial values in w[0..63] don't matter, so many implementations zero them here)
+			 * copy chunk into first 16 words w[0..15] of the message schedule array
+			 */
+			uint32_t w[16];
+
+			for (j = 0; j < 16; j++) {
+				if (i == 0) {
+					w[j] = (uint32_t) p[0] << 24 | (uint32_t) p[1] << 16 |
+						(uint32_t) p[2] << 8 | (uint32_t) p[3];
+					p += 4;
+				} else {
+					/* Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array: */
+					const uint32_t s0 = right_rot(w[(j + 1) & 0xf], 7) ^ right_rot(w[(j + 1) & 0xf], 18) ^ (w[(j + 1) & 0xf] >> 3);
+					const uint32_t s1 = right_rot(w[(j + 14) & 0xf], 17) ^ right_rot(w[(j + 14) & 0xf], 19) ^ (w[(j + 14) & 0xf] >> 10);
+					w[j] = w[j] + s0 + w[(j + 9) & 0xf] + s1;
+				}
+				const uint32_t s1 = right_rot(ah[4], 6) ^ right_rot(ah[4], 11) ^ right_rot(ah[4], 25);
+				const uint32_t ch = (ah[4] & ah[5]) ^ (~ah[4] & ah[6]);
+				const uint32_t temp1 = ah[7] + s1 + ch + k[i * 16 + j] + w[j];
+				const uint32_t s0 = right_rot(ah[0], 2) ^ right_rot(ah[0], 13) ^ right_rot(ah[0], 22);
+				const uint32_t maj = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2]);
+				const uint32_t temp2 = s0 + maj;
+
+				ah[7] = ah[6];
+				ah[6] = ah[5];
+				ah[5] = ah[4];
+				ah[4] = ah[3] + temp1;
+				ah[3] = ah[2];
+				ah[2] = ah[1];
+				ah[1] = ah[0];
+				ah[0] = temp1 + temp2;
+			}
 		}
 
 		/* Add the compressed chunk to the current hash value: */
