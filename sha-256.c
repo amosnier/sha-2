@@ -187,7 +187,7 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 				}
 				const uint32_t s1 = right_rot(ah[4], 6) ^ right_rot(ah[4], 11) ^ right_rot(ah[4], 25);
 				const uint32_t ch = (ah[4] & ah[5]) ^ (~ah[4] & ah[6]);
-				const uint32_t temp1 = ah[7] + s1 + ch + k[i * 16 + j] + w[j];
+				const uint32_t temp1 = ah[7] + s1 + ch + k[i << 4 | j] + w[j];
 				const uint32_t s0 = right_rot(ah[0], 2) ^ right_rot(ah[0], 13) ^ right_rot(ah[0], 22);
 				const uint32_t maj = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2]);
 				const uint32_t temp2 = s0 + maj;
