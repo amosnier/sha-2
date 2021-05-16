@@ -67,38 +67,38 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 */
 	uint32_t h[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
 
-	/* Reserve a chunk for Pre-processing (appending the single '1' bit, optional padding and the message length) */
+	/* Reserve a chunk for Pre-processing */
 	uint8_t processed_chunk[CHUNK_SIZE];
 
-	const uint8_t *chunk = input;
-	const uint8_t *input_end = (uint8_t *) input + len;
-	size_t appended = 0;
-
 	/* Process the message and additional appended bytes in successive 512-bit chunks */
-	while (chunk < input_end || appended < 1 + INT64_SIZE) {
+	const uint8_t *input_end = (uint8_t *) input + len;
+	for (const uint8_t *chunk = input; chunk < input_end + 1 + INT64_SIZE; chunk += CHUNK_SIZE) {
 		const uint8_t *p;
 
 		if (chunk + CHUNK_SIZE <= input_end) {
 			/* Normal processing */
 			p = chunk;
-			chunk += CHUNK_SIZE;
 		} else {
-			/* We are near or past the end of the input, do we have any input bytes remaining? */
-			const size_t remaining = input_end - chunk;
-			if (remaining > 0)
-				memcpy(processed_chunk, chunk, remaining);
-			/* Add padding bytes (some may be overwritten) */
-			memset(&processed_chunk[remaining], 0, CHUNK_SIZE - remaining);
-			/* Did we not yet add the single '1' bit in previous chunk? */
-			if (appended < 1)
-				processed_chunk[remaining] = 0x80;
-			/* Do we have the room left for the 64-bit message length? */
-			if (remaining + 1 + INT64_SIZE <= CHUNK_SIZE)
+			/*
+			 * Pre-processing, append the following to the input:
+			 * - A single '1' bit
+			 * - Padding with '0' bits so that all chunks are 512-bit
+			 * - The 64-bit message length at the end
+			 */
+			memset(processed_chunk, 0, CHUNK_SIZE);
+			if (chunk == input_end) {
+				/* Input ended exactly at the end of previous chunk, start this chunk with the single '1' bit */
+				processed_chunk[0] = 0x80;
+			} else if (chunk < input_end) {
+				/* Copy the last bytes of input to this chunk, followed by the single '1' bit */
+				memcpy(processed_chunk, chunk, input_end - chunk);
+				processed_chunk[input_end - chunk] = 0x80;
+			}
+			/* Add the 64-bit message length if it fits in this chunk, otherwise in the next chunk */
+			if (chunk + CHUNK_SIZE >= input_end + 1 + INT64_SIZE)
 				memcpy(&processed_chunk[CHUNK_SIZE - INT64_SIZE], total_len, INT64_SIZE);
 
-			appended += CHUNK_SIZE - remaining;
 			p = processed_chunk;
-			chunk += remaining;
 		}
 
 		uint32_t ah[8];
