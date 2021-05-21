@@ -4,7 +4,11 @@
 #include "sha-256.h"
 
 #define CHUNK_SIZE 64
-#define INT64_SIZE 8
+#define TOTAL_LEN_LEN 8
+
+/*
+ * ABOUT bool: this file does not use bool in order to be as pre-C99 compatible as possible.
+ */
 
 /*
  * Comments from pseudo-code at https://en.wikipedia.org/wiki/SHA-2 are reproduced here.
@@ -26,6 +30,14 @@ static const uint32_t k[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
+struct buffer_state {
+	const uint8_t * p;
+	size_t len;
+	size_t total_len;
+	int single_one_delivered; /* bool */
+	int total_len_delivered; /* bool */
+};
+
 static inline uint32_t right_rot(uint32_t value, unsigned int count)
 {
 	/*
@@ -33,6 +45,72 @@ static inline uint32_t right_rot(uint32_t value, unsigned int count)
 	 * which is what we need here.
 	 */
 	return value >> count | value << (32 - count);
+}
+
+static void init_buf_state(struct buffer_state * state, const void * input, size_t len)
+{
+	state->p = input;
+	state->len = len;
+	state->total_len = len;
+	state->single_one_delivered = 0;
+	state->total_len_delivered = 0;
+}
+
+/* Return value: bool */
+static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
+{
+	size_t space_in_chunk;
+
+	if (state->total_len_delivered) {
+		return 0;
+	}
+
+	if (state->len >= CHUNK_SIZE) {
+		memcpy(chunk, state->p, CHUNK_SIZE);
+		state->p += CHUNK_SIZE;
+		state->len -= CHUNK_SIZE;
+		return 1;
+	}
+
+	memcpy(chunk, state->p, state->len);
+	chunk += state->len;
+	space_in_chunk = CHUNK_SIZE - state->len;
+	state->p += state->len;
+	state->len = 0;
+
+	/* If we are here, space_in_chunk is one at minimum. */
+	if (!state->single_one_delivered) {
+		*chunk++ = 0x80;
+		space_in_chunk -= 1;
+		state->single_one_delivered = 1;
+	}
+
+	/*
+	 * Now:
+	 * - either there is enough space left for the total length, and we can conclude,
+	 * - or there is too little space left, and we have to pad the rest of this chunk with zeroes.
+	 * In the latter case, we will conclude at the next invokation of this function.
+	 */
+	if (space_in_chunk >= TOTAL_LEN_LEN) {
+		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
+		size_t len = state->total_len;
+		int i;
+		memset(chunk, 0x00, left);
+		chunk += left;
+
+		/* Storing of len * 8 as a big endian 64-bit without overflow. */
+		chunk[7] = (uint8_t) (len << 3);
+		len >>= 5;
+		for (i = 6; i >= 0; i--) {
+			chunk[i] = (uint8_t) len;
+			len >>= 8;
+		}
+		state->total_len_delivered = 1;
+	} else {
+		memset(chunk, 0x00, space_in_chunk);
+	}
+
+	return 1;
 }
 
 /*
@@ -54,54 +132,24 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	 *     the first word of the input message "abc" after padding is 0x61626380
 	 */
 
-	unsigned i, j;
-
-	/* The length of the original message in bits as a 64-bit big-endian integer */
-	uint8_t total_len[INT64_SIZE];
-	for (i = 0; i < INT64_SIZE; i++)
-		total_len[i] = (uint8_t) ((len << 3) >> ((INT64_SIZE - i - 1) * 8));
-
 	/*
 	 * Initialize hash values:
 	 * (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
 	 */
 	uint32_t h[] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+	unsigned i, j;
 
-	/* Reserve a chunk for Pre-processing */
-	uint8_t processed_chunk[CHUNK_SIZE];
+	/* 512-bit chunks is what we will operate on. */
+	uint8_t chunk[64];
 
-	/* Process the message and additional appended bytes in successive 512-bit chunks */
-	const uint8_t *input_end = (uint8_t *) input + len;
-	for (const uint8_t *chunk = input; chunk < input_end + 1 + INT64_SIZE; chunk += CHUNK_SIZE) {
-		const uint8_t *p;
+	struct buffer_state state;
 
-		if (chunk + CHUNK_SIZE <= input_end) {
-			/* Normal processing */
-			p = chunk;
-		} else {
-			/*
-			 * Pre-processing, append the following to the input:
-			 * - A single '1' bit
-			 * - Padding with '0' bits so that all chunks are 512-bit
-			 * - The 64-bit message length at the end
-			 */
-			memset(processed_chunk, 0, CHUNK_SIZE);
-			if (chunk == input_end) {
-				/* Input ended exactly at the end of previous chunk, start this chunk with the single '1' bit */
-				processed_chunk[0] = 0x80;
-			} else if (chunk < input_end) {
-				/* Copy the last bytes of input to this chunk, followed by the single '1' bit */
-				memcpy(processed_chunk, chunk, input_end - chunk);
-				processed_chunk[input_end - chunk] = 0x80;
-			}
-			/* Add the 64-bit message length if it fits in this chunk, otherwise in the next chunk */
-			if (chunk + CHUNK_SIZE >= input_end + 1 + INT64_SIZE)
-				memcpy(&processed_chunk[CHUNK_SIZE - INT64_SIZE], total_len, INT64_SIZE);
+	init_buf_state(&state, input, len);
 
-			p = processed_chunk;
-		}
-
+	while (calc_chunk(chunk, &state)) {
 		uint32_t ah[8];
+
+		const uint8_t *p = chunk;
 
 		/* Initialize working variables to current hash value: */
 		for (i = 0; i < 8; i++)
