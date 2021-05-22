@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Wpedantic
+CFLAGS = -O3 -Wall -Wextra -Wpedantic
 
 .PHONY: all
 all: test

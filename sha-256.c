@@ -1,6 +1,3 @@
-#include <stdint.h>
-#include <string.h>
-
 #include "sha-256.h"
 
 #define CHUNK_SIZE 64
@@ -31,7 +28,7 @@ static const uint32_t k[] = {
 };
 
 struct buffer_state {
-	const uint8_t * p;
+	const uint8_t *p;
 	size_t len;
 	size_t total_len;
 	int single_one_delivered; /* bool */
@@ -47,7 +44,7 @@ static inline uint32_t right_rot(uint32_t value, unsigned int count)
 	return value >> count | value << (32 - count);
 }
 
-static void init_buf_state(struct buffer_state * state, const void * input, size_t len)
+static void init_buf_state(struct buffer_state *state, const void *input, size_t len)
 {
 	state->p = input;
 	state->len = len;
@@ -56,25 +53,23 @@ static void init_buf_state(struct buffer_state * state, const void * input, size
 	state->total_len_delivered = 0;
 }
 
-/* Return value: bool */
-static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
+static inline const uint8_t *calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state *state)
 {
-	size_t space_in_chunk;
-
 	if (state->total_len_delivered) {
-		return 0;
+		return NULL;
 	}
 
 	if (state->len >= CHUNK_SIZE) {
-		memcpy(chunk, state->p, CHUNK_SIZE);
+		const uint8_t *const chunk_start = state->p;
 		state->p += CHUNK_SIZE;
 		state->len -= CHUNK_SIZE;
-		return 1;
+		return chunk_start;
 	}
 
+	const uint8_t *const chunk_start = chunk;
 	memcpy(chunk, state->p, state->len);
 	chunk += state->len;
-	space_in_chunk = CHUNK_SIZE - state->len;
+	size_t space_in_chunk = CHUNK_SIZE - state->len;
 	state->p += state->len;
 	state->len = 0;
 
@@ -89,7 +84,7 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 	 * Now:
 	 * - either there is enough space left for the total length, and we can conclude,
 	 * - or there is too little space left, and we have to pad the rest of this chunk with zeroes.
-	 * In the latter case, we will conclude at the next invokation of this function.
+	 * In the latter case, we will conclude at the next invocation of this function.
 	 */
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
 		const size_t left = space_in_chunk - TOTAL_LEN_LEN;
@@ -110,7 +105,7 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
 		memset(chunk, 0x00, space_in_chunk);
 	}
 
-	return 1;
+	return chunk_start;
 }
 
 /*
@@ -121,7 +116,7 @@ static int calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer_state * state)
  *   for bit string lengths that are not multiples of eight, and it really operates on arrays of bytes.
  *   In particular, the len parameter is a number of bytes.
  */
-void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
+void calc_sha_256(uint8_t hash[32], const void *input, size_t len)
 {
 	/*
 	 * Note 1: All integers (expect indexes) are 32-bit unsigned integers and addition is calculated modulo 2^32.
@@ -140,16 +135,16 @@ void calc_sha_256(uint8_t hash[32], const void * input, size_t len)
 	unsigned i, j;
 
 	/* 512-bit chunks is what we will operate on. */
-	uint8_t chunk[64];
+	uint8_t chunk[CHUNK_SIZE];
 
 	struct buffer_state state;
 
 	init_buf_state(&state, input, len);
 
-	while (calc_chunk(chunk, &state)) {
-		uint32_t ah[8];
+        const uint8_t *p;
 
-		const uint8_t *p = chunk;
+        while ((p = calc_chunk(chunk, &state))) {
+		uint32_t ah[8];
 
 		/* Initialize working variables to current hash value: */
 		for (i = 0; i < 8; i++)

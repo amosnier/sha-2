@@ -53,9 +53,9 @@ static uint8_t data9[1005];
 #define SIZEOF_DATA11 536870912
 #define SIZEOF_DATA12 1090519040
 #define SIZEOF_DATA13 1610612798
-static uint8_t * data11;
-static uint8_t * data12;
-static uint8_t * data13;
+static uint8_t *data11;
+static uint8_t *data12;
+static uint8_t *data13;
 #endif
 
 struct vector {
@@ -173,8 +173,8 @@ static void hash_to_string(char string[65], const uint8_t hash[32])
 	for (i = 0; i < 32; i++) {
 		string += sprintf(string, "%02x", hash[i]);
 	}
-}	
-	
+}
+
 static int string_test(const char input[], const char output[])
 {
 	uint8_t hash[32];
@@ -189,7 +189,7 @@ static int string_test(const char input[], const char output[])
 	} else {
 		printf("SUCCESS!\n\n");
 		return 0;
-	}		
+	}
 }
 
 /*
@@ -199,7 +199,7 @@ static int string_test(const char input[], const char output[])
  * for values that in practice are less than 2^32 - 1. Rationale: ANSI
  * C-compatibility and keeping it simple.
  */
-static int test(const uint8_t * input, size_t input_len, const char output[])
+static int test(const uint8_t *input, size_t input_len, const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
