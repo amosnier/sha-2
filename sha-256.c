@@ -82,7 +82,7 @@ static inline const uint8_t *calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer
 	/*
 	 * Now:
 	 * - either there is enough space left for the total length, and we can conclude,
-	 * - or there is too little space left, and we have to pad the rest of this chunk with zeroes.  In the latter
+	 * - or there is too little space left, and we have to pad the rest of this chunk with zeroes. In the latter
 	 *   case, we will conclude at the next invocation of this function.
 	 */
 	if (space_in_chunk >= TOTAL_LEN_LEN) {
@@ -111,9 +111,9 @@ static inline const uint8_t *calc_chunk(uint8_t chunk[CHUNK_SIZE], struct buffer
  * Limitations:
  * - Since input is a pointer, the data to hash must be directly accessible to the processor, which could be a problem
  *   for large data sizes.
- * - SHA algorithms theoretically operate on bit strings. However, this implementation has no support
- *   for bit string lengths that are not multiples of eight, and it really operates on arrays of bytes.
- *   In particular, the len parameter is a number of bytes.
+ * - SHA algorithms theoretically operate on bit strings. However, this implementation has no support for bit string
+ *   lengths that are not multiples of eight, and it really operates on arrays of bytes.  In particular, the len
+ *   parameter is a number of bytes.
  */
 void calc_sha_256(uint8_t hash[32], const void *input, size_t len)
 {
