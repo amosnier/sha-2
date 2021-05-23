@@ -142,8 +142,7 @@ static void construct_binary_messages(void)
 	memset(data9, 0x55, sizeof data9);
 #if LARGE_MESSAGES
 	/*
-	 * Heap allocation as a workaround for some linkers not liking
-	 * large BSS segments.
+	 * Heap allocation as a workaround for some linkers not liking large BSS segments.
 	 */
 	data11 = malloc(SIZEOF_DATA11);
 	data12 = malloc(SIZEOF_DATA12);
@@ -194,10 +193,9 @@ static int string_test(const char input[], const char output[])
 
 /*
  * Limitation:
- * - The variable input_len will be truncated to its LONG_BIT least
- * significant bits in the print output. This will never be a problem
- * for values that in practice are less than 2^32 - 1. Rationale: ANSI
- * C-compatibility and keeping it simple.
+ * - The variable input_len will be truncated to its LONG_BIT least significant bits in the print output. This will
+ *   never be a problem for values that in practice are less than 2^32 - 1. Rationale: ANSI C-compatibility and keeping
+ *   it simple.
  */
 static int test(const uint8_t *input, size_t input_len, const char output[])
 {
@@ -205,7 +203,7 @@ static int test(const uint8_t *input, size_t input_len, const char output[])
 	char hash_string[65];
 	calc_sha_256(hash, input, input_len);
 	hash_to_string(hash_string, hash);
-	printf("input starts with 0x%02x, length %lu\n", *input, (unsigned long) input_len);
+	printf("input starts with 0x%02x, length %lu\n", *input, (unsigned long)input_len);
 	printf("hash : %s\n", hash_string);
 	if (strcmp(output, hash_string)) {
 		printf("FAILURE!\n\n");
@@ -219,16 +217,15 @@ static int test(const uint8_t *input, size_t input_len, const char output[])
 int main(void)
 {
 	size_t i;
-	for (i = 0; i < (sizeof STRING_VECTORS / sizeof (struct string_vector)); i++) {
+	for (i = 0; i < (sizeof STRING_VECTORS / sizeof(struct string_vector)); i++) {
 		const struct string_vector *vector = &STRING_VECTORS[i];
 		if (string_test(vector->input, vector->output))
 			return 1;
 	}
 	construct_binary_messages();
-	for (i = 0; i < (sizeof vectors / sizeof (struct vector)); i++) {
+	for (i = 0; i < (sizeof vectors / sizeof(struct vector)); i++) {
 		const struct vector *vector = &vectors[i];
-		if (test(vector->input, vector->input_len, vector->output))
-		{
+		if (test(vector->input, vector->input_len, vector->output)) {
 			destruct_binary_messages();
 			return 1;
 		}
