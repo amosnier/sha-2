@@ -1,11 +1,15 @@
 CFLAGS = -O3 -Wall -Wextra -Wpedantic
 
+test: test.o sha-256.o
+
+test.o: sha-256.h test.c
+
+sha-256.o: sha-256.h sha-256.c
+
 .PHONY: all
 all: test
 	./test
 
-test: test.o sha-256.o
-
 .PHONY: clean
 clean:
-	rm test *.o
+	rm -f test *.o
