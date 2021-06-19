@@ -30,7 +30,8 @@ uint8_t hash[32];
 calc_sha_256(hash, "abc", strlen("abc"));
 ```
 
-See header file for more information.
+See [header file](https://github.com/amosnier/sha-2/blob/master/sha-256.h)
+for more information.
 
 Since the streaming API is a generalization of the non-streaming one,
 the latter has been ported to the former, without measurable performance
