@@ -127,7 +127,7 @@ static int string_test(const char input[], const char output[])
  * This define is only here to ease compared timing measurements between the non-streaming solution (former
  * implementation) and the streaming solution.
  */
-#define CALC_IN_CHUNKS 0
+#define CALC_IN_CHUNKS 1
 
 #if CALC_IN_CHUNKS
 static void calc_sha_256_in_chunks(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t len, size_t num_chunks)
