@@ -23,7 +23,7 @@ sha_256_write(&sha_256, "c", strlen("c"));
 sha_256_close(&sha_256);
 ```
 
-That is the equivalent of the (of course still supported):
+That is the equivalent of the (of course still supported) legacy way:
 
 ```C
 uint8_t hash[32];
