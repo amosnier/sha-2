@@ -15,7 +15,7 @@ API has been created.
 The following code is a silly but complete example:
 
 ```C
-struct sha_256 sha_256;
+struct Sha_256 sha_256;
 uint8_t hash[32];
 sha_256_init(&sha_256, hash);
 sha_256_write(&sha_256, "ab", strlen("ab"));

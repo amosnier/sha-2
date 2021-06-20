@@ -132,7 +132,7 @@ static int string_test(const char input[], const char output[])
 #if CALC_IN_CHUNKS
 static void calc_sha_256_in_chunks(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t len, size_t num_chunks)
 {
-	struct sha_256 sha_256;
+	struct Sha_256 sha_256;
 	sha_256_init(&sha_256, hash);
 
 	if (num_chunks > 0) {
