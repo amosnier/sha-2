@@ -123,8 +123,8 @@ c23ce8a7 895f4b21 ec0daf37 920ac0a2 62a22004 5a03eb2d fed48ef9 b05aabea
 
 ## License
 
-This repository is made available in the public domain. See [LICENSE
-FILE](LICENSE).
+This repository is made available under a permissive license. See
+[LICENSE FILE](LICENSE.md).
 
 ## Reference implementation
 
