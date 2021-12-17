@@ -3,10 +3,6 @@
 #define TOTAL_LEN_LEN 8
 
 /*
- * ABOUT bool: this file does not use bool in order to be as pre-C99 compatible as possible.
- */
-
-/*
  * Comments from pseudo-code at https://en.wikipedia.org/wiki/SHA-2 are reproduced here.
  * When useful for clarification, portions of the pseudo-code are reproduced here too.
  */
