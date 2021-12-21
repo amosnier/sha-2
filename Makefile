@@ -1,4 +1,4 @@
-CFLAGS = -O3 -Wall -Wextra -Wpedantic
+CFLAGS = -O3 -Wall -Wextra -Wpedantic -std=c99
 
 test: test.o sha-256.o
 

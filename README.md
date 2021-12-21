@@ -6,20 +6,18 @@ SHA-2 algorithm implementations.
 
 At the moment, only SHA-256 is implemented.
 
-## (not so) NEW: C89 no longer supported
+## Design criteria
 
-At the time of writing, I have just realized that the latest commit on
-the master branch cannot be compiled without errors as C89 source code.
-This is because the target I had initially made this implementation for
-has been running an earlier version of this implementation for some
-years, and I have not until today tried to compile a newer version for
-that target.
+- C99
 
-My strategy for that target, that will be dropped sooner or later, is to
-stick to the older version. Since no issue has been reported by people
-using C89, I assume that C89 support is not a need of this repository's
-users, and I hereby officially confirm that C89 is no longer supported
-for this repository.
+- Easy to test, include in any project, compile and link.
+
+- Portable. Makes no assumptions on the target system's endianess or
+  word size.
+
+- The SHA-256 implementation is a straightforward implementation of
+  the algorithm specified on
+  [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
 
 ## Streaming API
 
@@ -54,17 +52,6 @@ impact. However, [a legacy
 branch](https://github.com/amosnier/sha-2/tree/legacy) has been created
 in order to make the legacy implementation easily available. If you can
 measure a significant difference between the two, please post an issue.
-
-## Design criteria
-
-- Easy to test, include in any project, compile and link.
-
-- Portable. Makes no assumptions on the target system's endianess or
-  word size.
-
-- The SHA-256 implementation is a straightforward implementation of
-  the algorithm specified on
-  [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
 
 ## Notes
 
