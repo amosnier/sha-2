@@ -112,13 +112,12 @@ static int string_test(const char input[], const char output[])
 	char hash_string[65];
 	calc_sha_256(hash, input, strlen(input));
 	hash_to_string(hash_string, hash);
-	printf("input: %s\n", input);
-	printf("hash : %s\n", hash_string);
+	printf("hsh: %s ", hash_string);
 	if (strcmp(output, hash_string)) {
-		printf("FAILURE!\n\n");
+		printf("FAILURE! --- input: %s\n", input);
 		return 1;
 	} else {
-		printf("SUCCESS!\n\n");
+		printf("SUCCESS! --- input: %s\n", input);
 		return 0;
 	}
 }
@@ -164,40 +163,56 @@ static int test(const uint8_t *input, size_t input_len, const char output[])
 {
 	uint8_t hash[32];
 	char hash_string[65];
+
 	calc_sha_256(hash, input, input_len);
 	hash_to_string(hash_string, hash);
-	printf("input starts with 0x%02x, length %lu\n", *input, (unsigned long)input_len);
-	printf("hash: %s\n", hash_string);
+
+	printf("hsh: %s ", hash_string);
 	if (strcmp(output, hash_string)) {
-		printf("FAILURE!\n\n");
+		printf("FAILURE! --- input: 0x%02x length: %lu\n", *input, (unsigned long)input_len);
 		return 1;
-#if CALC_IN_CHUNKS
 	} else {
-		printf("SUCCESS!\n");
+		printf("SUCCESS! --- input: 0x%02x length: %lu\n", *input, (unsigned long)input_len);
 	}
+
+#if CALC_IN_CHUNKS
 	calc_sha_256_in_chunks(hash, input, input_len, num_chunks);
 	hash_to_string(hash_string, hash);
-	printf("hash in chunks: %s\n", hash_string);
+	printf("\tchk: %s ", hash_string);
 	if (strcmp(output, hash_string)) {
-		printf("FAILURE!\n\n");
+		printf("FAILURE! --- input: 0x%02x length: %lu\n", *input, (unsigned long)input_len);
 		return 1;
-#endif
 	} else {
-		printf("SUCCESS!\n\n");
-		return 0;
+		printf("SUCCESS! --- input: 0x%02x length: %lu\n", *input, (unsigned long)input_len);
 	}
+#endif
+	return 0;
 }
 
 int main(void)
 {
 	size_t i;
-	for (i = 0; i < (sizeof STRING_VECTORS / sizeof(struct string_vector)); i++) {
+
+	const size_t STRING_VECTORS_TOTAL = (sizeof STRING_VECTORS / sizeof(struct string_vector));
+	const size_t VECTORS_TOTAL = (sizeof vectors / sizeof(struct vector));
+
+	printf("\nINPUT STRING TEST\n\n");
+
+	for (i = 0; i < STRING_VECTORS_TOTAL; i++) {
+
+		printf("[%02ld/%02ld] ", i + 1, STRING_VECTORS_TOTAL);
+
 		const struct string_vector *vector = &STRING_VECTORS[i];
 		if (string_test(vector->input, vector->output))
 			return 1;
 	}
 	construct_binary_messages();
-	for (i = 0; i < (sizeof vectors / sizeof(struct vector)); i++) {
+
+	printf("\nHASH FUNCTION TEST\n\n");
+
+	for (i = 0; i < VECTORS_TOTAL; i++) {
+		printf("[%02ld/%02ld] ", i + 1, VECTORS_TOTAL);
+
 		const struct vector *vector = &vectors[i];
 #if CALC_IN_CHUNKS
 		if (test(vector->input, vector->input_len, vector->output, 5)) {
@@ -209,12 +224,20 @@ int main(void)
 		}
 	}
 	destruct_binary_messages();
+
+	printf("\nCRAZY EDGE CASES\n\n");
+
 #if CALC_IN_CHUNKS
 	/* Test some silly corner cases. Only empty chunks and no chunk at all. */
 	assert(strlen(STRING_VECTORS[0].input) == 0);
+
+	printf("[02/01] ");
+
 	if (test((const uint8_t *)STRING_VECTORS[0].input, strlen(STRING_VECTORS[0].input), STRING_VECTORS[0].output,
 		 5))
 		return 1;
+
+	printf("[02/02] ");
 	if (test((const uint8_t *)STRING_VECTORS[0].input, strlen(STRING_VECTORS[0].input), STRING_VECTORS[0].output,
 		 0))
 		return 1;
