@@ -172,7 +172,7 @@ uint8_t *sha_256_close(struct Sha_256 *sha_256)
 	uint32_t *const h = sha_256->h;
 
 	/*
-	 * The current chunk cannot be full. Otherwise, it would already have be consumed. I.e. there is space left for
+	 * The current chunk cannot be full. Otherwise, it would already have been consumed. I.e. there is space left for
 	 * at least one byte. The next step in the calculation is to add a single one-bit to the data.
 	 */
 	*pos++ = 0x80;
