@@ -19,6 +19,76 @@ At the moment, only SHA-256 is implemented.
   the algorithm specified on
   [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
 
+## Quick Usage
+### Installation
+just copy and paste the files "sha256.h" and "sha-256.c" into your program's repository, and include them with:
+~~~cpp
+#include "sha-256.c"
+~~~
+### Generating your first Sha
+to generate your first Sha just call the function, **calc_sha_256_from_string_returning_string** as in the example below:
+~~~cpp
+#include <stdio.h>
+#include "sha-256.c"
+
+int main(){
+
+    const char * input = "Hello World";
+    char * hash = calc_sha_256_from_string_returning_string(input);
+    printf("Hash: %s\n", hash);
+    free(hash);
+    return 0;
+}
+~~~
+If you want to generate your shas from any value, you can call the **calc_sha_256_returning_string** function, but note that you must take care of passing the length of the argument to the function in this case
+~~~cpp
+#include <stdio.h>
+#include "sha-256.c"
+int main(){
+
+    const char * input = "Hello World";
+    char * hash = calc_sha_256_returning_string(input, strlen(input));
+    printf("Hash: %s\n", hash);
+    free(hash);
+    return 0;
+}
+~~~
+### A lower level approach
+If you want to do your one-way encryption using arrays of integers, this is also possible using the function: **calc_sha_256**
+
+~~~cpp
+#include <stdio.h>
+#include "sha-256.c"
+
+int main(){
+
+    const char * input = "Hello World";
+    uint8_t hash[SIZE_OF_SHA_256_HASH];
+	  calc_sha_256(hash, input, strlen(input));
+    printf("Hash: ");
+    for (unsigned int i = 0; i < SIZE_OF_SHA_256_HASH; i++) {
+        printf("%02x", hash[i]);
+    }
+    
+}
+~~~
+### Encrypting Files
+You can also encrypt files passing directly its path, (Note that if the file does not exist the return result will be null)
+~~~cpp
+#include <stdio.h>
+#include "sha-256.c"
+
+
+int main(){
+
+    const char * file = "sha-256.c";
+    char * hash = calc_sha_256_from_file_returning_string(file);
+    printf("The hash of %s is %s\n", file, hash);
+    free(hash);
+}
+~~~
+
+
 ## Streaming API
 
 In response to [an enhancement
