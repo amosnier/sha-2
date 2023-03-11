@@ -1,4 +1,6 @@
 *~
 *.o
+*.out
 test
 *.swp
+testage_file.c

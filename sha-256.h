@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +62,36 @@ void calc_sha_256(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t 
  *
  * @note If either of the passed pointers is NULL, the results are unpredictable.
  */
+
+char * calc_sha_256_returning_string(const void *input, size_t len);
+/*
+	@param input: the string to be hashed
+	@param len: the length of the string
+	@return: the hash of the string
+	@note: if the input string is NULL, the results are unpredictable
+*/
+
+void calc_sha_256_from_string(uint8_t hash[SIZE_OF_SHA_256_HASH], const char *input);
+/*
+	@param hash: the hash array, where the result is delivered
+	@param input: the string to be hashed
+	@note: if the input string is NULL, the results are unpredictable
+*/
+
+int calc_sha_256_from_file(uint8_t hash[SIZE_OF_SHA_256_HASH], const char *filename);
+/*
+	@param hash: the hash array, where the result is delivered
+	@param filename: the name of the file to be hashed
+	@return: 0 if the file was hashed successfully, -1 otherwise
+*/
+
+char * calc_sha_256_from_file_returning_string(const char *filename);
+/*
+	@param filename: the name of the file to be hashed
+	@return: the hash of the file
+	@note: if the filename is NULL, the return value is NULL
+*/
+
 void sha_256_init(struct Sha_256 *sha_256, uint8_t hash[SIZE_OF_SHA_256_HASH]);
 
 /*
@@ -95,6 +126,8 @@ void sha_256_write(struct Sha_256 *sha_256, const void *data, size_t len);
  * has been invoked with empty data) is legal. It will calculate the SHA-256 value of the empty string.
  */
 uint8_t *sha_256_close(struct Sha_256 *sha_256);
+
+
 
 #ifdef __cplusplus
 }
