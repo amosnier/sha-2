@@ -136,7 +136,11 @@ void sha_256_write(struct Sha_256 *sha_256, const void *data, size_t len)
 {
 	sha_256->total_len += len;
 
-	const uint8_t *p = data;
+	/*
+	 * The following cast is not necessary, and could even be considered as poor practice. However, it makes this
+	 * file valid C++, which could be a good thing for some use cases.
+	 */
+	const uint8_t *p = (const uint8_t *)data;
 
 	while (len > 0) {
 		/*
