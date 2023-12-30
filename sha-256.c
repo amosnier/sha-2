@@ -176,8 +176,8 @@ uint8_t *sha_256_close(struct Sha_256 *sha_256)
 	uint32_t *const h = sha_256->h;
 
 	/*
-	 * The current chunk cannot be full. Otherwise, it would already have been consumed. I.e. there is space left for
-	 * at least one byte. The next step in the calculation is to add a single one-bit to the data.
+	 * The current chunk cannot be full. Otherwise, it would already have been consumed. I.e. there is space left
+	 * for at least one byte. The next step in the calculation is to add a single one-bit to the data.
 	 */
 	*pos++ = 0x80;
 	--space_left;
@@ -196,7 +196,7 @@ uint8_t *sha_256_close(struct Sha_256 *sha_256)
 	const size_t left = space_left - TOTAL_LEN_LEN;
 	memset(pos, 0x00, left);
 	pos += left;
-	size_t len = sha_256->total_len;
+	uint64_t len = sha_256->total_len;
 	pos[7] = (uint8_t)(len << 3);
 	len >>= 5;
 	int i;

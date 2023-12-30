@@ -32,7 +32,7 @@ struct Sha_256 {
 	uint8_t chunk[SIZE_OF_SHA_256_CHUNK];
 	uint8_t *chunk_pos;
 	size_t space_left;
-	size_t total_len;
+	uint64_t total_len;
 	uint32_t h[8];
 };
 
@@ -54,10 +54,10 @@ void calc_sha_256(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t 
  * @param sha_256 A pointer to a SHA-256 structure.
  * @param hash Hash array, where the result will be delivered.
  *
- * @note If all of the data you are calculating the hash value on is not available in a contiguous buffer in memory, this is
- * where you should start. Instantiate a SHA-256 structure, for instance by simply declaring it locally, make your hash
- * buffer available, and invoke this function. Once a SHA-256 hash has been calculated (see further below) a SHA-256
- * structure can be initialized again for the next calculation.
+ * @note If all of the data you are calculating the hash value on is not available in a contiguous buffer in memory,
+ * this is where you should start. Instantiate a SHA-256 structure, for instance by simply declaring it locally, make
+ * your hash buffer available, and invoke this function. Once a SHA-256 hash has been calculated (see further below) a
+ * SHA-256 structure can be initialized again for the next calculation.
  *
  * @note If either of the passed pointers is NULL, the results are unpredictable.
  */
