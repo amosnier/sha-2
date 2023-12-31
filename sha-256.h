@@ -46,6 +46,8 @@ struct Sha_256 {
  * the function you should use.
  *
  * @note If either of the passed pointers is NULL, the results are unpredictable.
+ *
+ * @note See note about maximum data length for sha_256_write, as it applies for this function's len argument too.
  */
 void calc_sha_256(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t len);
 
