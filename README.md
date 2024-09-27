@@ -1,4 +1,4 @@
-# sha-2 [![Build Status](https://api.travis-ci.com/amosnier/sha-2.svg?branch=master)](https://app.travis-ci.com/amosnier/sha-2)
+# sha-2 ![Build passing](svg/passing.svg)
 
 ## Contents
 
