@@ -15,10 +15,6 @@ At the moment, only SHA-256 is implemented.
 - Portable. Makes no assumptions on the target system's endianess or
   word size.
 
-- The SHA-256 implementation is a straightforward implementation of
-  the algorithm specified on
-  [Wikipedia](https://en.wikipedia.org/wiki/SHA-2).
-
 ## Streaming API
 
 In response to [an enhancement
@@ -60,17 +56,9 @@ it general. Its purpose is mainly to ease testing for the developer's
 host machine. The actual implementation is however extremely easy to
 include in any project, may it use GNU make or any other build tool.
 
-## Code review
-
-This code has been reviewed at [Stack Exchange CODE
-REVIEW](https://codereview.stackexchange.com/questions/182812/self-contained-sha-256-implementation-in-c),
-and the implementation has been improved accordingly.
-
 ## Testing
 
-Testing is continuously performed on Travis CI (see above).
-
-Apart from that, the implementation has been successfully tested on an x86-64 machine
+The implementation has been successfully tested on an x86-64 machine
 under Linux as well as on a 16-bit DSP. On the x86-64 machine, all the
 available NIST test vectors where successfully tested ([SHA-256
 examples](https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf)
